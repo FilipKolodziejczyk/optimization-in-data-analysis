@@ -26,3 +26,11 @@ DL5 (gr. 3) Learning neural networks using Stochastic Gradient Descent with tuni
 - evaluation of the project performance based on the presented project report and the program implementing the selected optimization method
 - evaluation of the presentation (20 minutes long) presenting the results obtained in the project in front of other students participating in the course classes - during the presentation, the teacher asks questions to the members of the project team regarding the implementation of the project
 - assessment of the implementation of the method during a meeting with the project team and assessment of oral answers to questions regarding the lecture material
+
+### Papers and other materials
+
+- [AdaGrad Paper](https://www.jmlr.org/papers/volume12/duchi11a/duchi11a.pdf)
+- [AdaGrad Article with Code](https://machinelearningmastery.com/gradient-descent-with-adagrad-from-scratch/)
+- [Adam Article](https://machinelearningmastery.com/adam-optimization-algorithm-for-deep-learning/)
+- [CollaboNet GitHub](https://github.com/wonjininfo/CollaboNet)
+- [Article about Named Entity Recognition](https://www.datacamp.com/blog/what-is-named-entity-recognition-ner)
