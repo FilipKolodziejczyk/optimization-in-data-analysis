@@ -1,0 +1,236 @@
+TensorFlow 2.0 Upgrade Script
+-----------------------------
+Converted 10 files
+Detected 20 issues that require attention
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+File: ./run.py
+--------------------------------------------------------------------------------
+./run.py:233:12: WARNING: *.save requires manual check. (This warning is only applicable if the code saves a tf.Keras model) Keras model.save now saves to the Tensorflow SavedModel format by default, instead of HDF5. To continue saving to HDF5, add the argument save_format='h5' to the save() function.
+--------------------------------------------------------------------------------
+File: ./model/sublayerFC.py
+--------------------------------------------------------------------------------
+./model/sublayerFC.py:7:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./model/sublayerFC.py:8:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./model/sublayerFC.py:11:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./model/sublayerFC.py:12:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./model/sublayerFC.py:47:9: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+./model/sublayerFC.py:49:9: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+--------------------------------------------------------------------------------
+File: ./model/CollaboNet.py
+--------------------------------------------------------------------------------
+./model/CollaboNet.py:69:28: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./model/CollaboNet.py:70:28: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./model/CollaboNet.py:165:30: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+./model/CollaboNet.py:171:33: WARNING: Using member tf.contrib.seq2seq.sequence_loss in deprecated module tf.contrib.seq2seq. (Manual edit required) tf.contrib.seq2seq.* have been migrated to `tfa.seq2seq.*` in TensorFlow Addons. Please see https://github.com/tensorflow/addons for more info.
+./model/CollaboNet.py:171:33: ERROR: Using member tf.contrib.seq2seq.sequence_loss in deprecated module tf.contrib. tf.contrib.seq2seq.sequence_loss cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+./model/CollaboNet.py:173:58: ERROR: Using member tf.contrib.crf.crf_log_likelihood in deprecated module tf.contrib. tf.contrib.crf.crf_log_likelihood cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+--------------------------------------------------------------------------------
+File: ./model/RunModel.py
+--------------------------------------------------------------------------------
+./model/RunModel.py:136:39: ERROR: Using member tf.contrib.crf.viterbi_decode in deprecated module tf.contrib. tf.contrib.crf.viterbi_decode cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+--------------------------------------------------------------------------------
+File: ./ops/embeddingOps.py
+--------------------------------------------------------------------------------
+./ops/embeddingOps.py:75:29: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./ops/embeddingOps.py:77:30: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./ops/embeddingOps.py:80:23: WARNING: tf.nn.embedding_lookup requires manual check. `partition_strategy` has been removed from tf.nn.embedding_lookup.  The 'div' strategy will be used by default.
+./ops/embeddingOps.py:98:23: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./ops/embeddingOps.py:100:24: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+./ops/embeddingOps.py:103:19: WARNING: tf.nn.embedding_lookup requires manual check. `partition_strategy` has been removed from tf.nn.embedding_lookup.  The 'div' strategy will be used by default.
+================================================================================
+Detailed log follows:
+
+================================================================================
+================================================================================
+Input tree: '.'
+================================================================================
+--------------------------------------------------------------------------------
+Processing file './run.py'
+ outputting to './run.py'
+--------------------------------------------------------------------------------
+
+57:4: INFO: Renamed 'tf.set_random_seed' to 'tf.compat.v1.set_random_seed'
+60:17: INFO: Renamed 'tf.ConfigProto' to 'tf.compat.v1.ConfigProto'
+142:9: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+146:8: INFO: Renamed 'tf.set_random_seed' to 'tf.compat.v1.set_random_seed'
+147:17: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+148:16: INFO: Renamed 'tf.train.Saver' to 'tf.compat.v1.train.Saver'
+149:17: INFO: Renamed 'tf.train.Saver' to 'tf.compat.v1.train.Saver'
+160:27: INFO: tf.summary.FileWriter requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+160:27: INFO: Renamed 'tf.summary.FileWriter' to 'tf.compat.v1.summary.FileWriter'
+233:12: WARNING: *.save requires manual check. (This warning is only applicable if the code saves a tf.Keras model) Keras model.save now saves to the Tensorflow SavedModel format by default, instead of HDF5. To continue saving to HDF5, add the argument save_format='h5' to the save() function.
+265:13: INFO: Renamed 'tf.Session' to 'tf.compat.v1.Session'
+268:12: INFO: Renamed 'tf.set_random_seed' to 'tf.compat.v1.set_random_seed'
+269:21: INFO: Renamed 'tf.global_variables_initializer' to 'tf.compat.v1.global_variables_initializer'
+270:21: INFO: Renamed 'tf.train.Saver' to 'tf.compat.v1.train.Saver'
+283:27: INFO: tf.summary.FileWriter requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+283:27: INFO: Renamed 'tf.summary.FileWriter' to 'tf.compat.v1.summary.FileWriter'
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './preprocessing.py'
+ outputting to './preprocessing.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './model/sublayerFC.py'
+ outputting to './model/sublayerFC.py'
+--------------------------------------------------------------------------------
+
+6:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+7:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+7:18: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+8:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+8:18: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+8:64: INFO: tf.constant_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+8:64: INFO: Renamed 'tf.constant_initializer' to 'tf.compat.v1.constant_initializer'
+11:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+11:18: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+12:18: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+12:18: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+12:64: INFO: tf.constant_initializer requires manual check. Initializers no longer have the dtype argument in the constructor or partition_info argument in the __call__ method.
+The calls have been converted to compat.v1 for safety (even though they may already have been correct).
+12:64: INFO: Renamed 'tf.constant_initializer' to 'tf.compat.v1.constant_initializer'
+24:9: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+25:25: INFO: Renamed 'tf.random_normal' to 'tf.random.normal'
+26:25: INFO: Renamed 'tf.random_normal' to 'tf.random.normal'
+27:27: INFO: Renamed 'tf.random_normal' to 'tf.random.normal'
+29:25: INFO: Renamed 'tf.random_normal' to 'tf.random.normal'
+30:25: INFO: Renamed 'tf.random_normal' to 'tf.random.normal'
+31:27: INFO: Renamed 'tf.random_normal' to 'tf.random.normal'
+47:9: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+49:9: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './model/__init__.py'
+ outputting to './model/__init__.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './model/CollaboNet.py'
+ outputting to './model/CollaboNet.py'
+--------------------------------------------------------------------------------
+
+12:17: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+13:21: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+14:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+15:26: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+16:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+17:18: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+18:17: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+19:21: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+20:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+21:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+22:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+23:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+24:22: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+25:27: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+26:28: INFO: Renamed 'tf.placeholder' to 'tf.compat.v1.placeholder'
+47:17: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+50:34: INFO: Renamed 'tf.nn.rnn_cell.BasicLSTMCell' to 'tf.compat.v1.nn.rnn_cell.BasicLSTMCell'
+52:34: INFO: Renamed 'tf.nn.rnn_cell.BasicLSTMCell' to 'tf.compat.v1.nn.rnn_cell.BasicLSTMCell'
+54:50: INFO: Renamed 'tf.nn.bidirectional_dynamic_rnn' to 'tf.compat.v1.nn.bidirectional_dynamic_rnn'
+65:17: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+67:25: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+69:28: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+69:28: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+69:56: INFO: Renamed 'tf.truncated_normal' to 'tf.random.truncated_normal'
+70:28: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+70:28: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+71:31: INFO: Added keywords to args of function 'tf.nn.conv2d'
+71:31: INFO: Renamed keyword argument for tf.nn.conv2d from filter to filters
+79:33: INFO: Added keywords to args of function 'tf.nn.max_pool'
+79:33: INFO: Renamed keyword argument for tf.nn.max_pool from value to input
+79:33: INFO: Renamed 'tf.nn.max_pool' to 'tf.nn.max_pool2d'
+87:38: INFO: Changing keep_prob arg of tf.nn.dropout to rate
+
+113:13: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+150:22: INFO: Renamed 'tf.nn.rnn_cell.BasicLSTMCell' to 'tf.compat.v1.nn.rnn_cell.BasicLSTMCell'
+152:22: INFO: Renamed 'tf.nn.rnn_cell.BasicLSTMCell' to 'tf.compat.v1.nn.rnn_cell.BasicLSTMCell'
+154:40: INFO: Renamed 'tf.nn.bidirectional_dynamic_rnn' to 'tf.compat.v1.nn.bidirectional_dynamic_rnn'
+161:27: INFO: Changing keep_prob arg of tf.nn.dropout to rate
+
+162:27: INFO: Changing keep_prob arg of tf.nn.dropout to rate
+
+165:30: ERROR: Using member tf.contrib.layers.fully_connected in deprecated module tf.contrib. tf.contrib.layers.fully_connected cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+171:33: WARNING: Using member tf.contrib.seq2seq.sequence_loss in deprecated module tf.contrib.seq2seq. (Manual edit required) tf.contrib.seq2seq.* have been migrated to `tfa.seq2seq.*` in TensorFlow Addons. Please see https://github.com/tensorflow/addons for more info.
+171:33: ERROR: Using member tf.contrib.seq2seq.sequence_loss in deprecated module tf.contrib. tf.contrib.seq2seq.sequence_loss cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+173:58: ERROR: Using member tf.contrib.crf.crf_log_likelihood in deprecated module tf.contrib. tf.contrib.crf.crf_log_likelihood cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+176:25: INFO: Renamed 'tf.train.AdagradOptimizer' to 'tf.compat.v1.train.AdagradOptimizer'
+180:21: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+181:20: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+183:37: INFO: tf.summary.merge_all requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+183:37: INFO: Renamed 'tf.summary.merge_all' to 'tf.compat.v1.summary.merge_all'
+189:13: INFO: `name` passed to `name_scope`. Because you may be re-entering an existing scope, it is not safe to convert automatically,  the v2 name_scope does not support re-entering scopes by name.
+
+189:13: INFO: Renamed 'tf.name_scope' to 'tf.compat.v1.name_scope'
+191:12: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+192:17: INFO: `name` passed to `name_scope`. Because you may be re-entering an existing scope, it is not safe to convert automatically,  the v2 name_scope does not support re-entering scopes by name.
+
+192:17: INFO: Renamed 'tf.name_scope' to 'tf.compat.v1.name_scope'
+194:12: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+195:12: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+196:12: INFO: tf.summary.scalar requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+197:12: INFO: tf.summary.histogram requires manual check. The TF 1.x summary API cannot be automatically migrated to TF 2.0, so symbols have been converted to tf.compat.v1.summary.* and must be migrated manually. Typical usage will only require changes to the summary writing logic, not to individual calls like scalar(). For examples of the new summary API, see the Effective TF 2.0 migration document or check the TF 2.0 TensorBoard tutorials.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './model/RunModel.py'
+ outputting to './model/RunModel.py'
+--------------------------------------------------------------------------------
+
+136:39: ERROR: Using member tf.contrib.crf.viterbi_decode in deprecated module tf.contrib. tf.contrib.crf.viterbi_decode cannot be converted automatically. tf.contrib will not be distributed with TensorFlow 2.0, please consider an alternative in non-contrib TensorFlow, a community-maintained repository such as tensorflow/addons, or fork the required code.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './ops/inputData.py'
+ outputting to './ops/inputData.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './ops/__init__.py'
+ outputting to './ops/__init__.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './ops/ops.py'
+ outputting to './ops/ops.py'
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+Processing file './ops/embeddingOps.py'
+ outputting to './ops/embeddingOps.py'
+--------------------------------------------------------------------------------
+
+74:9: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+75:29: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+75:29: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+77:30: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+77:30: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+80:23: WARNING: tf.nn.embedding_lookup requires manual check. `partition_strategy` has been removed from tf.nn.embedding_lookup.  The 'div' strategy will be used by default.
+97:9: INFO: Renamed 'tf.variable_scope' to 'tf.compat.v1.variable_scope'
+98:23: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+98:23: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+100:24: WARNING: tf.get_variable requires manual check. tf.get_variable returns ResourceVariables by default in 2.0, which have well-defined semantics and are stricter about shapes. You can disable this behavior by passing use_resource=False, or by calling tf.compat.v1.disable_resource_variables().
+100:24: INFO: Renamed 'tf.get_variable' to 'tf.compat.v1.get_variable'
+103:19: WARNING: tf.nn.embedding_lookup requires manual check. `partition_strategy` has been removed from tf.nn.embedding_lookup.  The 'div' strategy will be used by default.
+--------------------------------------------------------------------------------
+
