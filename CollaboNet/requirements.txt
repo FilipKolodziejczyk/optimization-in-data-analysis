@@ -1,0 +1,6 @@
+numpy
+cloudpickle
+tensorboard==2.16.2
+tensorflow==2.16.1
+tf_keras==2.16.0
+tfa-nightly==0.23.0.dev20240415222534
