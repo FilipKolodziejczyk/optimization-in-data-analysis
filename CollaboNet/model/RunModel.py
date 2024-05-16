@@ -1,7 +1,11 @@
 from ops.inputData import *
 from ops.ops import *
 
+import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
+
 import tensorflow_addons as tfa
+
 
 class RunModel:
     def __init__(self, model, args, ID2wordVecIdx, ID2char, expName, m_name, m_train='train', m_dev='dev', m_test='test'):
@@ -23,6 +27,16 @@ class RunModel:
         self.stop_counter = 0
         self.m_x_data, self.m_x_char_data, self.m_answerData, self.m_lengthData = input_datapickle(args.guidee_data, ID2wordVecIdx)
         self.m_batchgroup = batch_sort(self.m_lengthData, self.batch_size)
+
+        self.overwrite_model_optimizer()
+
+    def overwrite_model_optimizer(self):
+        if self.args.optimizer == 'adam':
+            self.model.train = tf.compat.v1.train.AdamOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        elif self.args.optimizer == 'sgd':
+            self.model.train = tf.compat.v1.train.GradientDescentOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        # else:  # this is the model's default - no need to overwrite
+        #     self.model.train = tf.compat.v1.train.AdagradOptimizer(learning_rate=self.lr).minimize(self.model.loss)
 
     def train1epoch(self, sess, batch_idx, infoInput=None, tbWriter=None): #infoInput not implimented yet
         for b_idx in batch_idx:

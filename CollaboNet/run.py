@@ -40,6 +40,8 @@ if __name__ == '__main__':
     parser.add_argument('--embdropout', type=float, help='input embedding dropout_rate', default=0.5)
     parser.add_argument('--lstmdropout', type=float, help='lstm output dropout_rate', default=0.3)
     parser.add_argument('--seed', type=int, help='seed value', default=0)
+    parser.add_argument('--optimizer', type=str, help='Choice of optimizer',
+                        choices=['adam', 'sgd', 'adagrad'], default='adagrad')
     args = parser.parse_args()
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  #tf verbose off(info, warning)
