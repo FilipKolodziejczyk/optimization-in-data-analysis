@@ -33,10 +33,13 @@ class RunModel:
     def overwrite_model_optimizer(self):
         if self.args.optimizer == 'adam':
             self.model.train = tf.compat.v1.train.AdamOptimizer(learning_rate=self.lr).minimize(self.model.loss)
-        elif self.args.optimizer == 'sgd':
-            self.model.train = tf.compat.v1.train.GradientDescentOptimizer(learning_rate=self.lr).minimize(self.model.loss)
-        # else:  # this is the model's default - no need to overwrite
-        #     self.model.train = tf.compat.v1.train.AdagradOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        elif self.args.optimizer == 'rmsprop':
+            self.model.train = tf.compat.v1.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        elif self.args.optimizer == 'adagrad':
+            self.model.train = tf.compat.v1.train.AdagradOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        else:
+            raise ValueError("Invalid optimizer")
+            
 
     def train1epoch(self, sess, batch_idx, infoInput=None, tbWriter=None): #infoInput not implimented yet
         for b_idx in batch_idx:
