@@ -118,7 +118,10 @@ if __name__ == '__main__':
                                                        scopename=dataSet)  #guideeInfo=None cuz in function we define
     dataNames = list()
     for dataSet in modelDict:
-        modelDict[dataSet]['lossList'] = list()
+        modelDict[dataSet]['trainLossList'] = list()
+        modelDict[dataSet]['testLossList'] = list()
+        modelDict[dataSet]['trainDurationList'] = list()
+        modelDict[dataSet]['testDurationList'] = list()
         modelDict[dataSet]['f1ValList'] = list()
         modelDict[dataSet]['f1ValWOCRFList'] = list()
         modelDict[dataSet]['maxF1'] = 0.0
@@ -232,16 +235,24 @@ if __name__ == '__main__':
                     loader.restore(sess, save_path)
 
             print(f" Start training {dataSet} model epoch {epoch_idx + 1} / {args.epoch}")
-            (l, sl, tra, trsPara) = modelDict[dataSet]['runner'].train1epoch(
+            (l, sl, tra, trsPara, train_duration) = modelDict[dataSet]['runner'].train1epoch(
                 sess, batch_idx, infoInput=intOuts, tbWriter=tbWriter)
 
-            print("== Epoch:%4d == | train time : %d Min | \n train loss: %.6f" % (
-            epoch_idx + 1, (time.time() - startTime) / 60, l))
-            modelDict[dataSet]['lossList'].append(l)
+            print("== Epoch:%4d == | time : %d Min | train epoch duration: %d s |"
+                  "\n train loss: %.6f" % (
+            epoch_idx + 1, (time.time() - startTime) / 60, train_duration, l))
+            modelDict[dataSet]['trainLossList'].append(l)
+            modelDict[dataSet]['trainDurationList'].append(train_duration)
 
             (t_predictionResult, t_prfValResult, t_prfValWOCRFResult,
-             test_x, test_ans, test_len) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
+             test_x, test_ans, test_len, test_loss, test_duration) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
                                                                                   infoInput=intOuts, epoch=epoch_idx)
+
+            print("== Epoch:%4d == | time : %d Min | test epoch duration: %d s |"
+                  "\n test loss: %.6f" % (
+            epoch_idx + 1, (time.time() - startTime) / 60, test_duration, test_loss))
+            modelDict[dataSet]['testLossList'].append(test_loss)
+            modelDict[dataSet]['testDurationList'].append(test_duration)
 
             modelDict[dataSet]['f1ValList'].append(t_prfValResult[2])
             saver.save(sess, './modelSave/' + expName + '/' + m_name + '/modelSaved')
@@ -299,6 +310,6 @@ if __name__ == '__main__':
                 tbWriter = None
 
             (t_predictionResult, t_prfValResult, t_prfValWOCRFResult,
-             test_x, test_ans, test_len) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
+             test_x, test_ans, test_len, test_loss, test_duration) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
                                                                                   infoInput=intOuts, epoch=None,
                                                                                   report=True)
