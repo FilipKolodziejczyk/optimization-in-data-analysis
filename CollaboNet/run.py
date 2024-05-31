@@ -1,5 +1,5 @@
 import argparse
-from collections import OrderedDict  # for OrderedDict()
+from collections import OrderedDict, defaultdict  # for OrderedDict()
 
 import os
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
@@ -130,6 +130,8 @@ if __name__ == '__main__':
         modelDict[dataSet]['stop_counter'] = 0
         modelDict[dataSet]['early_stop'] = False
         modelDict[dataSet]['m_name'] = modelDict[dataSet]['args'].guidee_data
+        modelDict[dataSet]['precisionValList'] = list()
+        modelDict[dataSet]['recallValList'] = list()
 
         dataNames.append(dataSet)
 
@@ -248,12 +250,16 @@ if __name__ == '__main__':
              test_x, test_ans, test_len, test_loss, test_duration) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
                                                                                   infoInput=intOuts, epoch=epoch_idx)
 
+            # prfValResult: (precision, recall, f1)
+
             print("== Epoch:%4d == | time : %d Min | test epoch duration: %d s |"
                   "\n test loss: %.6f" % (
             epoch_idx + 1, (time.time() - startTime) / 60, test_duration, test_loss))
             modelDict[dataSet]['testLossList'].append(test_loss)
             modelDict[dataSet]['testDurationList'].append(test_duration)
 
+            modelDict[dataSet]['precisionValList'].append(t_prfValResult[0])
+            modelDict[dataSet]['recallValList'].append(t_prfValResult[1])
             modelDict[dataSet]['f1ValList'].append(t_prfValResult[2])
             saver.save(sess, './modelSave/' + expName + '/' + m_name + '/modelSaved')
             pickle.dump(trsPara, open('./modelSave/' + expName + '/' + m_name + '/trs_param.pickle', 'wb'))
@@ -279,6 +285,26 @@ if __name__ == '__main__':
                     break
                 if modelDict[dname]['early_stop'] and didx == len(dataNames) - 1:
                     esFlag = True
+
+            # create a metrics dict with only pickle-able values
+            metricsDict = defaultdict(dict)
+            metricsDict[dataSet]['trainLossList'] = modelDict[dataSet]['trainLossList']
+            metricsDict[dataSet]['testLossList'] = modelDict[dataSet]['testLossList']
+            metricsDict[dataSet]['trainDurationList'] = modelDict[dataSet]['trainDurationList']
+            metricsDict[dataSet]['testDurationList'] = modelDict[dataSet]['testDurationList']
+            metricsDict[dataSet]['f1ValList'] = modelDict[dataSet]['f1ValList']
+            metricsDict[dataSet]['precisionValList'] = modelDict[dataSet]['precisionValList']
+            metricsDict[dataSet]['recallValList'] = modelDict[dataSet]['recallValList']
+            metricsDict[dataSet]['maxF1'] = modelDict[dataSet]['maxF1']
+            metricsDict[dataSet]['maxF1idx'] = modelDict[dataSet]['maxF1idx']
+            metricsDict[dataSet]['prevF1'] = modelDict[dataSet]['prevF1']
+            metricsDict[dataSet]['stop_counter'] = modelDict[dataSet]['stop_counter']
+            metricsDict[dataSet]['early_stop'] = modelDict[dataSet]['early_stop']
+            metricsDict[dataSet]['m_name'] = modelDict[dataSet]['m_name']
+
+            # save modelDict to the file after each epoch, overwrite the previous one
+            metrics_path = './modelSave/' + expName + '/' + dataSet + '/metricsDict.pickle'
+            pickle.dump(metricsDict, open(metrics_path, 'wb'))
 
             if esFlag:
                 break
