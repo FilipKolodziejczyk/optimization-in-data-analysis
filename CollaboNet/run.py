@@ -222,7 +222,10 @@ if __name__ == '__main__':
                             continue
                         else:
                             loadpath = './modelSave/' + expName + '/' + d_sub + '/'
-                            loader.restore(sess, tf.train.latest_checkpoint(loadpath))
+                            print('loadpath[224]:', loadpath)
+                            save_path = tf.train.latest_checkpoint(loadpath)
+                            if save_path is not None:
+                                loader.restore(sess, save_path)
                             intOuts[m_train].append(
                                 modelDict[d_sub]['runner'].info1epoch(m_train, modelDict[dataSet]['runner'], sess))
                             intOuts[m_dev].append(
