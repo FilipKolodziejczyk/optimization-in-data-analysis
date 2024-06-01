@@ -155,8 +155,8 @@ if __name__ == '__main__':
         np.random.seed(seedV)
         tf.compat.v1.set_random_seed(seedV)
         sess.run(tf.compat.v1.global_variables_initializer())
-        saver = tf.compat.v1.train.Saver(max_to_keep=10000)
-        loader = tf.compat.v1.train.Saver(max_to_keep=10000)
+        saver = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
+        loader = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
 
         print('====INITIALIZATION====')
         for epoch_idx in range(args.epoch * len(dataNames)):
