@@ -3,3 +3,5 @@
 .venv/
 *.cpython*
 modelSave/
+*.log
+*.sl

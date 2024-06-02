@@ -321,7 +321,7 @@ if __name__ == '__main__':
             np.random.seed(seedV)
             tf.compat.v1.set_random_seed(seedV)
             sess.run(tf.compat.v1.global_variables_initializer())
-            loader = tf.compat.v1.train.Saver(max_to_keep=10000)
+            loader = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
             loadpath = './modelSave/' + expName + '/' + m_name + '/'
 
             if args.pretrained != 0:
@@ -331,7 +331,10 @@ if __name__ == '__main__':
                 intOuts = None
 
             trsPara = pickle.load(open(loadpath + 'trs_param.pickle', 'rb'))
-            loader.restore(sess, tf.train.latest_checkpoint(loadpath))
+            print('loadpath[224]:', loadpath)
+            save_path = tf.train.latest_checkpoint(loadpath)
+            if save_path is not None:
+                loader.restore(sess, save_path)
 
             if modelDict[dataSet]['args'].tensorboard:
                 tbWriter = tf.compat.v1.summary.FileWriter('test')
