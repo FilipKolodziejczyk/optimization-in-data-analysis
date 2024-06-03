@@ -267,20 +267,20 @@ if __name__ == '__main__':
             saver.save(sess, './modelSave/' + expName + '/' + m_name + '/modelSaved')
             pickle.dump(trsPara, open('./modelSave/' + expName + '/' + m_name + '/trs_param.pickle', 'wb'))
 
-            if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
-                modelDict[dataSet]['early_stop'] = True
-                modelDict[dataSet]['maxF1'] = t_prfValResult[2]
-                modelDict[dataSet]['stop_counter'] = 0
-                modelDict[dataSet]['maxF1idx'] = epoch_idx
-                modelDict[dataSet]['trs_param'] = trsPara
-                modelDict[dataSet]['maxF1_x'] = test_x[:]
-                modelDict[dataSet]['maxF1_ans'] = test_ans[:]
-                modelDict[dataSet]['maxF1_len'] = test_len[:]
-                pickle.dump(modelDict[dataSet]['maxF1idx'],
-                            open('./modelSave/' + expName + '/' + dataSet + '/maxF1idx.pickle', 'wb'))
-                if args.pretrained != 0:
-                    pickle.dump(intOuts[m_test],
-                                open('./modelSave/' + expName + '/' + dataSet + '/bestInouts.pickle', 'wb'))
+            # if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
+            modelDict[dataSet]['early_stop'] = True
+            modelDict[dataSet]['maxF1'] = t_prfValResult[2]
+            modelDict[dataSet]['stop_counter'] = 0
+            modelDict[dataSet]['maxF1idx'] = epoch_idx
+            modelDict[dataSet]['trs_param'] = trsPara
+            modelDict[dataSet]['maxF1_x'] = test_x[:]
+            modelDict[dataSet]['maxF1_ans'] = test_ans[:]
+            modelDict[dataSet]['maxF1_len'] = test_len[:]
+            pickle.dump(modelDict[dataSet]['maxF1idx'],
+                        open('./modelSave/' + expName + '/' + dataSet + '/maxF1idx.pickle', 'wb'))
+            if args.pretrained != 0:
+                pickle.dump(intOuts[m_test],
+                            open('./modelSave/' + expName + '/' + dataSet + '/bestInouts.pickle', 'wb'))
 
             for didx, dname in enumerate(dataNames):
                 if not modelDict[dname]['early_stop']:
