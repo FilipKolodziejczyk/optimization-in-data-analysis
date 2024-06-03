@@ -268,7 +268,7 @@ if __name__ == '__main__':
             pickle.dump(trsPara, open('./modelSave/' + expName + '/' + m_name + '/trs_param.pickle', 'wb'))
 
             # if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
-            modelDict[dataSet]['early_stop'] = True
+            modelDict[dataSet]['early_stop'] = False
             modelDict[dataSet]['maxF1'] = t_prfValResult[2]
             modelDict[dataSet]['stop_counter'] = 0
             modelDict[dataSet]['maxF1idx'] = epoch_idx
