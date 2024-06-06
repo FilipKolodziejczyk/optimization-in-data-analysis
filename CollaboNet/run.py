@@ -155,8 +155,8 @@ if __name__ == '__main__':
         np.random.seed(seedV)
         tf.compat.v1.set_random_seed(seedV)
         sess.run(tf.compat.v1.global_variables_initializer())
-        saver = tf.compat.v1.train.Saver(max_to_keep=10000)
-        loader = tf.compat.v1.train.Saver(max_to_keep=10000)
+        saver = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
+        loader = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
 
         print('====INITIALIZATION====')
         for epoch_idx in range(args.epoch * len(dataNames)):
@@ -222,7 +222,10 @@ if __name__ == '__main__':
                             continue
                         else:
                             loadpath = './modelSave/' + expName + '/' + d_sub + '/'
-                            loader.restore(sess, tf.train.latest_checkpoint(loadpath))
+                            print('loadpath[224]:', loadpath)
+                            save_path = tf.train.latest_checkpoint(loadpath)
+                            if save_path is not None:
+                                loader.restore(sess, save_path)
                             intOuts[m_train].append(
                                 modelDict[d_sub]['runner'].info1epoch(m_train, modelDict[dataSet]['runner'], sess))
                             intOuts[m_dev].append(
@@ -264,20 +267,20 @@ if __name__ == '__main__':
             saver.save(sess, './modelSave/' + expName + '/' + m_name + '/modelSaved')
             pickle.dump(trsPara, open('./modelSave/' + expName + '/' + m_name + '/trs_param.pickle', 'wb'))
 
-            if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
-                modelDict[dataSet]['early_stop'] = True
-                modelDict[dataSet]['maxF1'] = t_prfValResult[2]
-                modelDict[dataSet]['stop_counter'] = 0
-                modelDict[dataSet]['maxF1idx'] = epoch_idx
-                modelDict[dataSet]['trs_param'] = trsPara
-                modelDict[dataSet]['maxF1_x'] = test_x[:]
-                modelDict[dataSet]['maxF1_ans'] = test_ans[:]
-                modelDict[dataSet]['maxF1_len'] = test_len[:]
-                pickle.dump(modelDict[dataSet]['maxF1idx'],
-                            open('./modelSave/' + expName + '/' + dataSet + '/maxF1idx.pickle', 'wb'))
-                if args.pretrained != 0:
-                    pickle.dump(intOuts[m_test],
-                                open('./modelSave/' + expName + '/' + dataSet + '/bestInouts.pickle', 'wb'))
+            # if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
+            modelDict[dataSet]['early_stop'] = False
+            modelDict[dataSet]['maxF1'] = t_prfValResult[2]
+            modelDict[dataSet]['stop_counter'] = 0
+            modelDict[dataSet]['maxF1idx'] = epoch_idx
+            modelDict[dataSet]['trs_param'] = trsPara
+            modelDict[dataSet]['maxF1_x'] = test_x[:]
+            modelDict[dataSet]['maxF1_ans'] = test_ans[:]
+            modelDict[dataSet]['maxF1_len'] = test_len[:]
+            pickle.dump(modelDict[dataSet]['maxF1idx'],
+                        open('./modelSave/' + expName + '/' + dataSet + '/maxF1idx.pickle', 'wb'))
+            if args.pretrained != 0:
+                pickle.dump(intOuts[m_test],
+                            open('./modelSave/' + expName + '/' + dataSet + '/bestInouts.pickle', 'wb'))
 
             for didx, dname in enumerate(dataNames):
                 if not modelDict[dname]['early_stop']:
@@ -318,7 +321,7 @@ if __name__ == '__main__':
             np.random.seed(seedV)
             tf.compat.v1.set_random_seed(seedV)
             sess.run(tf.compat.v1.global_variables_initializer())
-            loader = tf.compat.v1.train.Saver(max_to_keep=10000)
+            loader = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
             loadpath = './modelSave/' + expName + '/' + m_name + '/'
 
             if args.pretrained != 0:
@@ -328,7 +331,10 @@ if __name__ == '__main__':
                 intOuts = None
 
             trsPara = pickle.load(open(loadpath + 'trs_param.pickle', 'rb'))
-            loader.restore(sess, tf.train.latest_checkpoint(loadpath))
+            print('loadpath[224]:', loadpath)
+            save_path = tf.train.latest_checkpoint(loadpath)
+            if save_path is not None:
+                loader.restore(sess, save_path)
 
             if modelDict[dataSet]['args'].tensorboard:
                 tbWriter = tf.compat.v1.summary.FileWriter('test')
