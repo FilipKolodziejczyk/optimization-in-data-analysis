@@ -47,7 +47,7 @@ if __name__ == '__main__':
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  #tf verbose off(info, warning)
 
     #seed initialize
-    expName = setExpName()
+    expName = setExpName(optimizer=args.optimizer, lr=args.lr)
     if args.seed != 0:
         seedV = int(args.seed % 100000)
     else:
