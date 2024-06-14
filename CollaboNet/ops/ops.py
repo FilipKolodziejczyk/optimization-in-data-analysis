@@ -5,9 +5,9 @@ import time
 import numpy as np
 
 
-def setExpName(savePath='modelSave/'):
+def setExpName(savePath='modelSave/', optimizer='adagrad', lr=0.01):
     timeNow = time.strftime("%Y%m%d%H%M")
-    timeNow_edited = str(timeNow)
+    timeNow_edited = str(timeNow) + '_' + str(optimizer) + '_' + str(lr)
     print(timeNow_edited)
 
     suffix = 0

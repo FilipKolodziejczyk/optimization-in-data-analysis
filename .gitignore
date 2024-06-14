@@ -1,2 +1,8 @@
 /course-content/
 .DS_Store
+.venv/
+*.cpython*
+modelSave/
+*.log
+*.sl
+results/

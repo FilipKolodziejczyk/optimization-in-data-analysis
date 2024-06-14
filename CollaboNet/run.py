@@ -1,5 +1,5 @@
 import argparse
-from collections import OrderedDict  # for OrderedDict()
+from collections import OrderedDict, defaultdict  # for OrderedDict()
 
 import os
 os.environ["TF_USE_LEGACY_KERAS"] = "1"
@@ -40,12 +40,14 @@ if __name__ == '__main__':
     parser.add_argument('--embdropout', type=float, help='input embedding dropout_rate', default=0.5)
     parser.add_argument('--lstmdropout', type=float, help='lstm output dropout_rate', default=0.3)
     parser.add_argument('--seed', type=int, help='seed value', default=0)
+    parser.add_argument('--optimizer', type=str, help='Choice of optimizer',
+                        choices=['adam', 'rmsprop', 'adagrad'], default='adagrad')
     args = parser.parse_args()
 
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'  #tf verbose off(info, warning)
 
     #seed initialize
-    expName = setExpName()
+    expName = setExpName(optimizer=args.optimizer, lr=args.lr)
     if args.seed != 0:
         seedV = int(args.seed % 100000)
     else:
@@ -116,7 +118,10 @@ if __name__ == '__main__':
                                                        scopename=dataSet)  #guideeInfo=None cuz in function we define
     dataNames = list()
     for dataSet in modelDict:
-        modelDict[dataSet]['lossList'] = list()
+        modelDict[dataSet]['trainLossList'] = list()
+        modelDict[dataSet]['testLossList'] = list()
+        modelDict[dataSet]['trainDurationList'] = list()
+        modelDict[dataSet]['testDurationList'] = list()
         modelDict[dataSet]['f1ValList'] = list()
         modelDict[dataSet]['f1ValWOCRFList'] = list()
         modelDict[dataSet]['maxF1'] = 0.0
@@ -125,6 +130,8 @@ if __name__ == '__main__':
         modelDict[dataSet]['stop_counter'] = 0
         modelDict[dataSet]['early_stop'] = False
         modelDict[dataSet]['m_name'] = modelDict[dataSet]['args'].guidee_data
+        modelDict[dataSet]['precisionValList'] = list()
+        modelDict[dataSet]['recallValList'] = list()
 
         dataNames.append(dataSet)
 
@@ -148,8 +155,8 @@ if __name__ == '__main__':
         np.random.seed(seedV)
         tf.compat.v1.set_random_seed(seedV)
         sess.run(tf.compat.v1.global_variables_initializer())
-        saver = tf.compat.v1.train.Saver(max_to_keep=10000)
-        loader = tf.compat.v1.train.Saver(max_to_keep=10000)
+        saver = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
+        loader = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
 
         print('====INITIALIZATION====')
         for epoch_idx in range(args.epoch * len(dataNames)):
@@ -215,7 +222,10 @@ if __name__ == '__main__':
                             continue
                         else:
                             loadpath = './modelSave/' + expName + '/' + d_sub + '/'
-                            loader.restore(sess, tf.train.latest_checkpoint(loadpath))
+                            print('loadpath[224]:', loadpath)
+                            save_path = tf.train.latest_checkpoint(loadpath)
+                            if save_path is not None:
+                                loader.restore(sess, save_path)
                             intOuts[m_train].append(
                                 modelDict[d_sub]['runner'].info1epoch(m_train, modelDict[dataSet]['runner'], sess))
                             intOuts[m_dev].append(
@@ -230,35 +240,47 @@ if __name__ == '__main__':
                     loader.restore(sess, save_path)
 
             print(f" Start training {dataSet} model epoch {epoch_idx + 1} / {args.epoch}")
-            (l, sl, tra, trsPara) = modelDict[dataSet]['runner'].train1epoch(
+            (l, sl, tra, trsPara, train_duration) = modelDict[dataSet]['runner'].train1epoch(
                 sess, batch_idx, infoInput=intOuts, tbWriter=tbWriter)
 
-            print("== Epoch:%4d == | train time : %d Min | \n train loss: %.6f" % (
-            epoch_idx + 1, (time.time() - startTime) / 60, l))
-            modelDict[dataSet]['lossList'].append(l)
+            print("== Epoch:%4d == | time : %d Min | train epoch duration: %d s |"
+                  "\n train loss: %.6f" % (
+            epoch_idx + 1, (time.time() - startTime) / 60, train_duration, l))
+            modelDict[dataSet]['trainLossList'].append(l)
+            modelDict[dataSet]['trainDurationList'].append(train_duration)
 
             (t_predictionResult, t_prfValResult, t_prfValWOCRFResult,
-             test_x, test_ans, test_len) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
+             test_x, test_ans, test_len, test_loss, test_duration) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
                                                                                   infoInput=intOuts, epoch=epoch_idx)
 
+            # prfValResult: (precision, recall, f1)
+
+            print("== Epoch:%4d == | time : %d Min | test epoch duration: %d s |"
+                  "\n test loss: %.6f" % (
+            epoch_idx + 1, (time.time() - startTime) / 60, test_duration, test_loss))
+            modelDict[dataSet]['testLossList'].append(test_loss)
+            modelDict[dataSet]['testDurationList'].append(test_duration)
+
+            modelDict[dataSet]['precisionValList'].append(t_prfValResult[0])
+            modelDict[dataSet]['recallValList'].append(t_prfValResult[1])
             modelDict[dataSet]['f1ValList'].append(t_prfValResult[2])
             saver.save(sess, './modelSave/' + expName + '/' + m_name + '/modelSaved')
             pickle.dump(trsPara, open('./modelSave/' + expName + '/' + m_name + '/trs_param.pickle', 'wb'))
 
-            if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
-                modelDict[dataSet]['early_stop'] = True
-                modelDict[dataSet]['maxF1'] = t_prfValResult[2]
-                modelDict[dataSet]['stop_counter'] = 0
-                modelDict[dataSet]['maxF1idx'] = epoch_idx
-                modelDict[dataSet]['trs_param'] = trsPara
-                modelDict[dataSet]['maxF1_x'] = test_x[:]
-                modelDict[dataSet]['maxF1_ans'] = test_ans[:]
-                modelDict[dataSet]['maxF1_len'] = test_len[:]
-                pickle.dump(modelDict[dataSet]['maxF1idx'],
-                            open('./modelSave/' + expName + '/' + dataSet + '/maxF1idx.pickle', 'wb'))
-                if args.pretrained != 0:
-                    pickle.dump(intOuts[m_test],
-                                open('./modelSave/' + expName + '/' + dataSet + '/bestInouts.pickle', 'wb'))
+            # if ((epoch_idx / len(dataNames)) == early_stops[epoch_idx % len(dataNames)]):
+            modelDict[dataSet]['early_stop'] = False
+            modelDict[dataSet]['maxF1'] = t_prfValResult[2]
+            modelDict[dataSet]['stop_counter'] = 0
+            modelDict[dataSet]['maxF1idx'] = epoch_idx
+            modelDict[dataSet]['trs_param'] = trsPara
+            modelDict[dataSet]['maxF1_x'] = test_x[:]
+            modelDict[dataSet]['maxF1_ans'] = test_ans[:]
+            modelDict[dataSet]['maxF1_len'] = test_len[:]
+            pickle.dump(modelDict[dataSet]['maxF1idx'],
+                        open('./modelSave/' + expName + '/' + dataSet + '/maxF1idx.pickle', 'wb'))
+            if args.pretrained != 0:
+                pickle.dump(intOuts[m_test],
+                            open('./modelSave/' + expName + '/' + dataSet + '/bestInouts.pickle', 'wb'))
 
             for didx, dname in enumerate(dataNames):
                 if not modelDict[dname]['early_stop']:
@@ -266,6 +288,26 @@ if __name__ == '__main__':
                     break
                 if modelDict[dname]['early_stop'] and didx == len(dataNames) - 1:
                     esFlag = True
+
+            # create a metrics dict with only pickle-able values
+            metricsDict = defaultdict(dict)
+            metricsDict[dataSet]['trainLossList'] = modelDict[dataSet]['trainLossList']
+            metricsDict[dataSet]['testLossList'] = modelDict[dataSet]['testLossList']
+            metricsDict[dataSet]['trainDurationList'] = modelDict[dataSet]['trainDurationList']
+            metricsDict[dataSet]['testDurationList'] = modelDict[dataSet]['testDurationList']
+            metricsDict[dataSet]['f1ValList'] = modelDict[dataSet]['f1ValList']
+            metricsDict[dataSet]['precisionValList'] = modelDict[dataSet]['precisionValList']
+            metricsDict[dataSet]['recallValList'] = modelDict[dataSet]['recallValList']
+            metricsDict[dataSet]['maxF1'] = modelDict[dataSet]['maxF1']
+            metricsDict[dataSet]['maxF1idx'] = modelDict[dataSet]['maxF1idx']
+            metricsDict[dataSet]['prevF1'] = modelDict[dataSet]['prevF1']
+            metricsDict[dataSet]['stop_counter'] = modelDict[dataSet]['stop_counter']
+            metricsDict[dataSet]['early_stop'] = modelDict[dataSet]['early_stop']
+            metricsDict[dataSet]['m_name'] = modelDict[dataSet]['m_name']
+
+            # save modelDict to the file after each epoch, overwrite the previous one
+            metrics_path = './modelSave/' + expName + '/' + dataSet + '/metricsDict.pickle'
+            pickle.dump(metricsDict, open(metrics_path, 'wb'))
 
             if esFlag:
                 break
@@ -279,7 +321,7 @@ if __name__ == '__main__':
             np.random.seed(seedV)
             tf.compat.v1.set_random_seed(seedV)
             sess.run(tf.compat.v1.global_variables_initializer())
-            loader = tf.compat.v1.train.Saver(max_to_keep=10000)
+            loader = tf.compat.v1.train.Saver(tf.compat.v1.trainable_variables(), max_to_keep=10000)
             loadpath = './modelSave/' + expName + '/' + m_name + '/'
 
             if args.pretrained != 0:
@@ -289,7 +331,10 @@ if __name__ == '__main__':
                 intOuts = None
 
             trsPara = pickle.load(open(loadpath + 'trs_param.pickle', 'rb'))
-            loader.restore(sess, tf.train.latest_checkpoint(loadpath))
+            print('loadpath[224]:', loadpath)
+            save_path = tf.train.latest_checkpoint(loadpath)
+            if save_path is not None:
+                loader.restore(sess, save_path)
 
             if modelDict[dataSet]['args'].tensorboard:
                 tbWriter = tf.compat.v1.summary.FileWriter('test')
@@ -297,6 +342,6 @@ if __name__ == '__main__':
                 tbWriter = None
 
             (t_predictionResult, t_prfValResult, t_prfValWOCRFResult,
-             test_x, test_ans, test_len) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
+             test_x, test_ans, test_len, test_loss, test_duration) = modelDict[dataSet]['runner'].dev1epoch(m_test, trsPara, sess,
                                                                                   infoInput=intOuts, epoch=None,
                                                                                   report=True)

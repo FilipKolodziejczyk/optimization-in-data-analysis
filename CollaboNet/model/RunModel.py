@@ -1,7 +1,13 @@
+import time
+
 from ops.inputData import *
 from ops.ops import *
 
+import tensorflow as tf
+tf.compat.v1.disable_eager_execution()
+
 import tensorflow_addons as tfa
+
 
 class RunModel:
     def __init__(self, model, args, ID2wordVecIdx, ID2char, expName, m_name, m_train='train', m_dev='dev', m_test='test'):
@@ -24,7 +30,21 @@ class RunModel:
         self.m_x_data, self.m_x_char_data, self.m_answerData, self.m_lengthData = input_datapickle(args.guidee_data, ID2wordVecIdx)
         self.m_batchgroup = batch_sort(self.m_lengthData, self.batch_size)
 
+        self.overwrite_model_optimizer()
+
+    def overwrite_model_optimizer(self):
+        if self.args.optimizer == 'adam':
+            self.model.train = tf.compat.v1.train.AdamOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        elif self.args.optimizer == 'rmsprop':
+            self.model.train = tf.compat.v1.train.RMSPropOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        elif self.args.optimizer == 'adagrad':
+            self.model.train = tf.compat.v1.train.AdagradOptimizer(learning_rate=self.lr).minimize(self.model.loss)
+        else:
+            raise ValueError("Invalid optimizer")
+            
+
     def train1epoch(self, sess, batch_idx, infoInput=None, tbWriter=None): #infoInput not implimented yet
+        start_time = time.perf_counter()
         for b_idx in batch_idx:
             x_minibatch, y_minibatch, xlen_minibatch, x_char_minibatch = idx2data(
                 self.m_batchgroup[self.m_train][b_idx], self.m_x_data[self.m_train], self.m_x_char_data[self.m_train], 
@@ -79,15 +99,18 @@ class RunModel:
                                                 self.model.train, 
                                                 self.model.transition_params],
                                                 feed_dict=feed_dict1)
-        return (l, sl, tra, trsPara) # Note the indent. It only gives last batch logit of 1 epoch training
+        duration = time.perf_counter() - start_time
+        return (l, sl, tra, trsPara, duration) # Note the indent. It only gives last batch logit of 1 epoch training
 
     def dev1epoch(self, data, trsPara, sess, infoInput=None, epoch=None, report=False): #data : dev or test?
+        start_time = time.perf_counter()
         predictionResult=list()
         viterbi_scoreList=list()
         predictionWOCRFResult=list()
         dev_x = list()
         dev_ans = list()
         dev_len = list()
+        total_loss = 0
 
         for b_idx in range(len(self.m_batchgroup[data])):
             x_minibatch, y_minibatch, xlen_minibatch, x_char_minibatch = idx2data(
@@ -132,8 +155,9 @@ class RunModel:
                           self.model.lstm_dropout: 0
                           }
             
-            logitsPridict = sess.run(self.model.logits, feed_dict=feed_dict2)
-            
+            logitsPridict, loss = sess.run([self.model.logits, self.model.loss], feed_dict=feed_dict2)
+            total_loss += loss
+
             for sentence in logitsPridict:
                 viterbi, viterbi_score=tfa.text.crf.viterbi_decode(sentence,trsPara)
                 predictionResult.append(viterbi)
@@ -142,6 +166,8 @@ class RunModel:
         
         predictionResult = viterbi_pp(predictionResult, dev_len, self.args.num_class)
         prfValResult=prf(predictionResult,dev_ans,dev_len)
+
+        validation_loss = total_loss / len(self.m_batchgroup[data])
 
         if data == self.m_dev:
             infoschk = sess.run([self.model.infos1_w, self.model.infos2_w, self.model.infos3_w, self.model.infos4_w, self.model.infos5_w])                                                                                   
@@ -153,8 +179,9 @@ class RunModel:
             print("[%s] Precision : %.4f | Recall : %.4f | F1: %.4f"%(data, prfValResult[0],prfValResult[1],prfValResult[2]))
 
         prfValWOCRFResult=None
+        duration = time.perf_counter() - start_time
         
-        return (predictionResult, prfValResult, prfValWOCRFResult, dev_x, dev_ans, dev_len)
+        return (predictionResult, prfValResult, prfValWOCRFResult, dev_x, dev_ans, dev_len, validation_loss, duration)
 
     def info1epoch(self, data, dataset, sess):
         # data : train, dev or test?
